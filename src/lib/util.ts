@@ -4,10 +4,7 @@ export function logWithBase(number: number, base: number) {
   return Math.log10(number) / Math.log10(base)
 }
 
-export function sameOperands(
-  array1: { op: OPS; operand: number }[],
-  array2: { op: OPS; operand: number }[],
-): boolean {
+export function sameOperands(array1: { op: OPS; operand: number }[], array2: { op: OPS; operand: number }[]): boolean {
   // Check if the arrays have the same length
   if (array1.length !== array2.length) {
     return false
@@ -38,28 +35,18 @@ export function sameOperands(
   return true
 }
 
-export function areArraysEqualUnordered(
-  array1: { op: OPS; operand: number }[],
-  array2: { op: OPS; operand: number }[],
-): boolean {
+export function areArraysEqualUnordered(array1: { op: OPS; operand: number }[], array2: { op: OPS; operand: number }[]): boolean {
   // Check if the arrays have the same length
   if (array1.length !== array2.length) {
     return false
   }
 
-  if (
-    array1.some((element) => element.op === OPS.EXPONENTIATE) ||
-    array2.some((element) => element.op === OPS.EXPONENTIATE)
-  ) {
+  if (array1.some((element) => element.op === OPS.EXPONENTIATE) || array2.some((element) => element.op === OPS.EXPONENTIATE)) {
     return false
   }
 
-  const array1Mult = array1.filter(
-    (element) => element.op === OPS.MULTIPLY || element.op === OPS.NOP,
-  )
-  const array2Mult = array2.filter(
-    (element) => element.op === OPS.MULTIPLY || element.op === OPS.NOP,
-  )
+  const array1Mult = array1.filter((element) => element.op === OPS.MULTIPLY || element.op === OPS.NOP)
+  const array2Mult = array2.filter((element) => element.op === OPS.MULTIPLY || element.op === OPS.NOP)
 
   if (!sameOperands(array1Mult, array2Mult)) {
     return false
@@ -82,10 +69,7 @@ export function areArraysEqualUnordered(
   return true
 }
 
-export function isNearlyInteger(
-  number: number,
-  tolerance: number = 1e-9,
-): boolean {
+export function isNearlyInteger(number: number, tolerance: number = 1e-9): boolean {
   return Math.abs(number - Math.round(number)) < tolerance
 }
 
