@@ -1,7 +1,7 @@
 <script lang="ts">
   import type Item from "../lib/Item"
   import { OPS } from "../lib/types"
-  import { getSymbolForOp } from "../lib/util"
+  import { getSymbolForOp, getUniqueElements } from "../lib/util"
 
   export let item: Item
 
@@ -25,6 +25,12 @@
 </script>
 
 <div class="solution">
+  <div class="extractions">
+    {#each item.getUniqueUsedNumbers() as num}
+      <div class="extraction">{num}</div>
+    {/each}
+  </div>
+
   {#each item.getOperations() as operation}
     <div class="operation {getOperationClass(operation.op)}">
       {getSymbolForOp(operation.op)}
@@ -43,6 +49,27 @@
   div.solution {
     display: flex;
     place-items: center;
+  }
+
+  div.extractions {
+    height: 3.5rem;
+    display: flex;
+    place-items: center;
+    margin-right: 2rem;
+    justify-content: center;
+  }
+
+  div.extraction {
+    min-width: 1.5rem;
+    min-height: 2rem;
+    margin: 0.1rem;
+    border: 1px solid black;
+    border-radius: 0.2rem;
+    background-color: #bd1925;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0rem 0.2rem;
   }
 
   div.operand {
