@@ -1,6 +1,6 @@
 import Item from "./Item"
 import { OPS } from "./types"
-import { areArraysEqualUnordered, getPrimeFactors, isNearlyInteger } from "./util"
+import { areArraysEqual, getPrimeFactors, isNearlyInteger } from "./util"
 import WorkQueue from "./WorkQueue"
 
 const extractableNumbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 15, 16]
@@ -31,8 +31,16 @@ function filterOutItemsWithPrimeNumbersHigherThanHighestExtractableNumber(workQu
 
 let solutions: Array<Item> = []
 
+function solutionsAreUsingSameNumbers(a: Item, b: Item) {
+  if (a.getUsedNumbers().length !== b.getUsedNumbers().length) {
+    return false
+  }
+
+  return areArraysEqual(a.getUsedNumbers(), b.getUsedNumbers())
+}
+
 function foundSolution(item: Item) {
-  const solutionAlreadyExists = solutions.some((solution) => areArraysEqualUnordered(solution.getOperations(), item.getOperations()))
+  const solutionAlreadyExists = solutions.some((solution) => solutionsAreUsingSameNumbers(solution, item))
   if (solutionAlreadyExists) {
     return
   }
@@ -91,6 +99,8 @@ function solve(numberOfInterest: number): { solutions: Array<Item>; checkedItems
     checkedItems += workQueue.length()
     workQueue.process(processItems)
   } while (workQueue.length() > 0 && solutions.length < 5)
+
+  solutions.sort((a, b) => a.getUniqueUsedNumbers().length - b.getUniqueUsedNumbers().length)
 
   return { solutions, checkedItems }
 }

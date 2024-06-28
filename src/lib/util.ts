@@ -4,71 +4,6 @@ export function logWithBase(number: number, base: number) {
   return Math.log10(number) / Math.log10(base)
 }
 
-export function sameOperands(array1: { op: OPS; operand: number }[], array2: { op: OPS; operand: number }[]): boolean {
-  // Check if the arrays have the same length
-  if (array1.length !== array2.length) {
-    return false
-  }
-
-  // Create frequency counters for each array
-  const frequencyCounter1: { [key: number]: number } = {}
-  const frequencyCounter2: { [key: number]: number } = {}
-
-  // Populate frequency counters
-  for (const element of array1) {
-    const identifier = element.operand
-    frequencyCounter1[identifier] = (frequencyCounter1[identifier] || 0) + 1
-  }
-
-  for (const element of array2) {
-    const identifier = element.operand
-    frequencyCounter2[identifier] = (frequencyCounter2[identifier] || 0) + 1
-  }
-
-  // Compare frequency counters
-  for (const key in frequencyCounter1) {
-    if (frequencyCounter1[key] !== frequencyCounter2[key]) {
-      return false
-    }
-  }
-
-  return true
-}
-
-export function areArraysEqualUnordered(array1: { op: OPS; operand: number }[], array2: { op: OPS; operand: number }[]): boolean {
-  // Check if the arrays have the same length
-  if (array1.length !== array2.length) {
-    return false
-  }
-
-  if (array1.some((element) => element.op === OPS.EXPONENTIATE) || array2.some((element) => element.op === OPS.EXPONENTIATE)) {
-    return false
-  }
-
-  const array1Mult = array1.filter((element) => element.op === OPS.MULTIPLY || element.op === OPS.NOP)
-  const array2Mult = array2.filter((element) => element.op === OPS.MULTIPLY || element.op === OPS.NOP)
-
-  if (!sameOperands(array1Mult, array2Mult)) {
-    return false
-  }
-
-  const array1Add = array1.filter((element) => element.op === OPS.ADD)
-  const array2Add = array2.filter((element) => element.op === OPS.ADD)
-
-  if (!sameOperands(array1Add, array2Add)) {
-    return false
-  }
-
-  const array1Sub = array1.filter((element) => element.op === OPS.SUBTRACT)
-  const array2Sub = array2.filter((element) => element.op === OPS.SUBTRACT)
-
-  if (!sameOperands(array1Sub, array2Sub)) {
-    return false
-  }
-
-  return true
-}
-
 export function isNearlyInteger(number: number, tolerance: number = 1e-9): boolean {
   return Math.abs(number - Math.round(number)) < tolerance
 }
@@ -120,4 +55,22 @@ export function getPrimeFactors(num: number): number[] {
   }
 
   return primeFactors
+}
+
+export function areArraysEqual<T>(array1: T[], array2: T[]): boolean {
+  if (array1.length !== array2.length) {
+    return false
+  }
+
+  for (let i = 0; i < array1.length; i++) {
+    if (array1[i] !== array2[i]) {
+      return false
+    }
+  }
+
+  return true
+}
+
+export function getUniqueElements<T>(arr: T[]): T[] {
+  return Array.from(new Set(arr))
 }

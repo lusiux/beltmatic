@@ -1,10 +1,11 @@
 import { OPS, type Solution } from "./types"
-import { isNearlyInteger } from "./util"
+import { getUniqueElements, isNearlyInteger } from "./util"
 
 export default class Item {
   private number: number
   private ops: string
   private operations: Array<{ op: OPS; operand: number }> = []
+  private usedNumbers: Array<number> = []
 
   constructor(private target: number) {
     this.number = target
@@ -75,5 +76,19 @@ export default class Item {
     return {
       ops: this.ops,
     }
+  }
+
+  public getUsedNumbers(): Array<number> {
+    if (this.usedNumbers.length === 0) {
+      this.usedNumbers = this.operations.map((operation) => operation.operand).sort((a, b) => a - b)
+    }
+    return this.usedNumbers
+  }
+
+  public getUniqueUsedNumbers(): Array<number> {
+    if (this.usedNumbers.length === 0) {
+      this.usedNumbers = this.operations.map((operation) => operation.operand).sort((a, b) => a - b)
+    }
+    return getUniqueElements(this.usedNumbers)
   }
 }
