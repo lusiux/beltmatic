@@ -1,57 +1,38 @@
 import Item from "./Item"
 import { OPS } from "./types"
-import {
-  areArraysEqualUnordered,
-  getPrimeFactors,
-  isNearlyInteger,
-} from "./util"
+import { areArraysEqualUnordered, getPrimeFactors, isNearlyInteger } from "./util"
 import WorkQueue from "./WorkQueue"
 
 const extractableNumbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 15, 16]
+const highestExtractableNumber = Math.max(...extractableNumbers)
 const multiplyNumbers = extractableNumbers.filter((num) => num !== 1).reverse()
-const maxMultiplyNumber = 15
-const exponentiateNumbers = multiplyNumbers.filter((num) => num !== 2)
 
-function generateNumbersToCheck(workQueue: WorkQueue<Item>, target: number) {
-  const item = new Item(target)
+const exponentiateNumbers = multiplyNumbers
+
+function isMineable(number: number) {
+  return extractableNumbers.some((extractableNumber) => extractableNumber === number)
+}
+
+function addNeighbouringNumbersToWorkQueue(workQueue: WorkQueue<Item>, target: Item) {
+  workQueue.add(target)
+  extractableNumbers.forEach((extractableNumber) => {
+    workQueue.add(target.clone().performOperation(OPS.ADD, extractableNumber))
+    workQueue.add(target.clone().performOperation(OPS.SUBTRACT, extractableNumber))
+  })
+}
+
+function filterOutItemsWithPrimeNumbersHigherThanHighestExtractableNumber(workQueue: WorkQueue<Item>, item: Item) {
   const factors = getPrimeFactors(item.getCurrentNumber())
-  if (!factors.some((num) => num > maxMultiplyNumber)) {
-    workQueue.add(item)
+  if (factors.some((num) => num > highestExtractableNumber)) {
+    return
   }
-  // console.log({ number: item.getCurrentNumber(), factors })
-
-  extractableNumbers.forEach((extractableNumber) => {
-    const item = new Item(target).performOperation(OPS.ADD, extractableNumber)
-    if (item.getCurrentNumber() > 0) {
-      const factors = getPrimeFactors(item.getCurrentNumber())
-      if (!factors.some((num) => num > maxMultiplyNumber)) {
-        workQueue.add(item)
-      }
-      // console.log({ number: item.getCurrentNumber(), factors })
-      // workQueue.add(item)
-    }
-  })
-  extractableNumbers.forEach((extractableNumber) => {
-    const item = new Item(target).performOperation(
-      OPS.SUBTRACT,
-      extractableNumber,
-    )
-    const factors = getPrimeFactors(item.getCurrentNumber())
-    if (!factors.some((num) => num > maxMultiplyNumber)) {
-      workQueue.add(item)
-    }
-    // console.log({ number: item.getCurrentNumber(), factors })
-    // console.log({number: item.getCurrentNumber(), factors: getPrimeFactors(item.getCurrentNumber())})
-    // workQueue.add(item)
-  })
+  workQueue.add(item)
 }
 
 let solutions: Array<Item> = []
 
 function foundSolution(item: Item) {
-  const solutionAlreadyExists = solutions.some((solution) =>
-    areArraysEqualUnordered(solution.getOperations(), item.getOperations()),
-  )
+  const solutionAlreadyExists = solutions.some((solution) => areArraysEqualUnordered(solution.getOperations(), item.getOperations()))
   if (solutionAlreadyExists) {
     return
   }
@@ -60,12 +41,16 @@ function foundSolution(item: Item) {
 }
 
 function processItems(workQueue: WorkQueue<Item>, item: Item) {
-  for (const number of extractableNumbers) {
-    if (item.getCurrentNumber() === number) {
-      foundSolution(item.clone().performOperation(OPS.NOP, number))
-      return
-    }
+  if (item.getCurrentNumber() < 1) {
+    return
   }
+
+  if (isMineable(item.getCurrentNumber())) {
+    foundSolution(item.performOperation(OPS.NOP, item.getCurrentNumber()))
+    return
+  }
+
+  const startItemCount = workQueue.length()
 
   for (const factor of multiplyNumbers) {
     const nextNumber = item.getCurrentNumber() / factor
@@ -80,23 +65,34 @@ function processItems(workQueue: WorkQueue<Item>, item: Item) {
       workQueue.add(item.clone().performOperation(OPS.EXPONENTIATE, exponent))
     }
   }
+
+  if (workQueue.length() === startItemCount) {
+    addNeighbouringNumbersToWorkQueue(workQueue, item)
+  }
 }
 
-function solve(numberOfInterest: number): Array<Item> {
+function solve(numberOfInterest: number): { solutions: Array<Item>; checkedItems: number } {
   const workQueue = new WorkQueue<Item>()
   solutions = []
+  let checkedItems = 0
 
-  generateNumbersToCheck(workQueue, numberOfInterest)
-  // console.log({ queuelength: workQueue.length() })
+  const target = new Item(numberOfInterest)
+
+  addNeighbouringNumbersToWorkQueue(workQueue, target)
+  workQueue.process(filterOutItemsWithPrimeNumbersHigherThanHighestExtractableNumber)
+
+  if (workQueue.length() === 0) {
+    // console.log("Simple algorithm will not work")
+    addNeighbouringNumbersToWorkQueue(workQueue, target)
+  }
+
   do {
-    // console.log({queuelength: workQueue.length()})
-    // if ( workQueue.length() === 6 ) {
-    //  workQueue.print()
-    // }
+    // console.log({ queuelength: workQueue.length() })
+    checkedItems += workQueue.length()
     workQueue.process(processItems)
   } while (workQueue.length() > 0 && solutions.length < 5)
 
-  return solutions
+  return { solutions, checkedItems }
 }
 
 export default solve
