@@ -46,7 +46,7 @@
   }
 
   div.operand {
-    width: 4rem;
+    min-width: 3rem;
     height: 3.5rem;
     margin: 0.2rem;
     border: 1px solid black;
@@ -56,10 +56,11 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    padding: 0rem 0.5rem;
   }
 
   div.operation {
-    width: 4rem;
+    min-width: 3rem;
     height: 3.5rem;
     margin: 0.2rem;
     border: 1px solid black;
@@ -69,6 +70,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    padding: 0rem 0.5rem;
   }
 
   div.NOP {
