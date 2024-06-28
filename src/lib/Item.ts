@@ -34,12 +34,6 @@ export default class Item {
       }
     } else if (op === OPS.EXPONENTIATE) {
       this.ops = `^ ${operand} ${this.ops}`
-      // console.log({
-      //     number: this.number,
-      //     newNumber: logWithBase(this.number, operand),
-      //     newRt: this.number ^ (1/operand),
-      //     operand
-      // })
       this.number = Math.pow(this.number, 1 / operand)
       if (isNearlyInteger(this.number)) {
         this.number = Math.round(this.number)
